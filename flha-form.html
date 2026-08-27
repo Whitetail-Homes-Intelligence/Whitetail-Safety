@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Whitetail Homes — FLHA</title>
+<style>
+  :root {
+    --brand: #025273;
+    --brand-dark: #013b52;
+    --bg: #f2f5f6;
+    --card: #ffffff;
+    --border: #d7e0e3;
+    --text: #17242a;
+    --muted: #5b6e75;
+    --danger: #b3261e;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding-bottom: 60px;
+  }
+  header {
+    background: var(--brand);
+    color: white;
+    padding: 20px 16px 24px;
+    text-align: center;
+  }
+  header img { width: 64px; height: 64px; border-radius: 8px; margin-bottom: 8px; }
+  header h1 { margin: 0; font-size: 1.25rem; font-weight: 700; }
+  header p { margin: 4px 0 0; font-size: 0.85rem; opacity: 0.9; }
+
+  main { max-width: 640px; margin: 0 auto; padding: 16px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card h2 {
+    margin: 0 0 12px;
+    font-size: 1rem;
+    color: var(--brand-dark);
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 8px;
+  }
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+  .field .hint { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+  input[type=text], input[type=date], input[type=time], select, textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text);
+    font-family: inherit;
+  }
+  textarea { min-height: 60px; resize: vertical; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .hazard-row, .worker-row {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    position: relative;
+    background: #fafcfc;
+  }
+  .hazard-row .row-title, .worker-row .row-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--brand-dark);
+    margin-bottom: 8px;
+  }
+  .remove-btn {
+    background: none;
+    border: none;
+    color: var(--danger);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+  .add-btn {
+    background: #eaf1f3;
+    border: 1px dashed var(--brand);
+    color: var(--brand-dark);
+    border-radius: 8px;
+    padding: 10px;
+    width: 100%;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .add-btn:active { background: #dfe9ec; }
+
+  .ppe-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .ppe-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+  .ppe-item input { width: 18px; height: 18px; }
+
+  .radio-group { display: flex; gap: 16px; }
+  .radio-group label { display: flex; align-items: center; gap: 6px; font-weight: 500; font-size: 0.95rem; }
+  .radio-group input { width: 18px; height: 18px; }
+
+  #concernsLocationField { display: none; margin-top: 10px; }
+
+  button[type=submit] {
+    width: 100%;
+    padding: 16px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    background: var(--brand);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+  button[type=submit]:active { background: var(--brand-dark); }
+
+  #successOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(2,82,115,0.95);
+    color: white;
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+  }
+  #successOverlay.show { display: flex; }
+  #successOverlay h2 { font-size: 1.4rem; margin-bottom: 8px; }
+  #successOverlay button {
+    margin-top: 20px;
+    padding: 12px 24px;
+    background: white;
+    color: var(--brand-dark);
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .config-warning {
+    background: #fff3cd;
+    border: 1px solid #e0c25b;
+    color: #664d03;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin: 12px 16px 0;
+  }
+  .backlink {
+    display: inline-block;
+    margin: 16px 16px 0;
+    color: var(--brand-dark);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  input[readonly] { background: #f0f3f4; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="data:image/jpeg;base64,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" alt="Whitetail Homes">
+  <h1>Field Level Hazard Assessment</h1>
+  <p>Complete before starting work on site</p>
+</header>
+
+<a class="backlink" id="backLink" href="site-forms.html">← Back to Forms</a>
+
+<div id="configWarning" class="config-warning">
+  ⚠️ Setup needed: open this file in a text editor and replace ACTION_URL near the bottom with your real Apps Script Web App URL before using this form for real submissions.
+</div>
+
+<main>
+  <form id="flhaForm" method="POST" target="hidden_iframe">
+
+    <div class="card">
+      <h2>Job Details</h2>
+      <div class="field">
+        <label>UVI</label>
+        <input type="text" name="uvi">
+      </div>
+      <div class="field">
+        <label>Site Name *</label>
+        <input type="text" name="site_name" id="siteNameField" required>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Job Group *</label>
+          <select name="job_group" required>
+            <option value="">Select...</option>
+            <option>Vertical</option>
+            <option>Suspended Slab</option>
+            <option>Finishing</option>
+            <option>General Labour</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Contractor *</label>
+          <input type="text" name="contractor" required>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Date *</label>
+          <input type="date" name="date" id="dateField" required>
+        </div>
+        <div class="field">
+          <label>Time *</label>
+          <input type="time" name="time" id="timeField" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>Worker Rep</label>
+        <input type="text" name="worker_rep_top">
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Hazard Assessment</h2>
+      <div id="hazardRows"></div>
+      <button type="button" class="add-btn" id="addHazardBtn">+ Add hazard / job task row</button>
+    </div>
+
+    <div class="card">
+      <h2>PPE Required for This Task</h2>
+      <div class="ppe-grid" id="ppeGrid">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Worker Concerns</h2>
+      <div class="field">
+        <label>Were any worker concerns raised?</label>
+        <div class="radio-group">
+          <label><input type="radio" name="concerns_raised" value="Yes" id="concernsYes"> Yes</label>
+          <label><input type="radio" name="concerns_raised" value="No" id="concernsNo" checked> No</label>
+        </div>
+      </div>
+      <div id="concernsLocationField" class="field">
+        <label>Concern Location</label>
+        <input type="text" name="concerns_location">
+      </div>
+      <div class="field">
+        <label>Notes</label>
+        <textarea name="notes"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Sign-off</h2>
+      <p class="hint" style="margin-top:-6px;margin-bottom:10px;">Typing your name here serves as your signature / acknowledgment on this form.</p>
+      <div id="workerRows"></div>
+      <button type="button" class="add-btn" id="addWorkerBtn">+ Add worker</button>
+
+      <div class="field" style="margin-top:14px;">
+        <label>Supervisor Name *</label>
+        <input type="text" name="supervisor_name" required>
+      </div>
+      <div class="field">
+        <label>Worker Rep Name</label>
+        <input type="text" name="worker_rep_name">
+      </div>
+      <div class="field">
+        <label>FLHA Close Out Time</label>
+        <input type="time" name="close_out_time">
+      </div>
+    </div>
+
+    <input type="hidden" name="hazards_json" id="hazardsJson">
+    <input type="hidden" name="workers_json" id="workersJson">
+
+    <button type="submit">Submit FLHA</button>
+  </form>
+</main>
+
+<iframe name="hidden_iframe" style="display:none;"></iframe>
+
+<div id="successOverlay">
+  <div>
+    <h2>✓ Submitted</h2>
+    <p>This FLHA has been recorded.</p>
+    <button id="newFormBtn">Start Another Form</button>
+  </div>
+</div>
+
+<script>
+  // ============================================================
+  // REQUIRED SETUP: paste your Apps Script Web App URL below,
+  // replacing the placeholder text between the quotes.
+  // ============================================================
+  const ACTION_URL = "https://script.google.com/macros/s/AKfycbzbLnhG4MBAnHj3Tcxy48-VB4oNVF0mkwSEySjV1QPxm_hwRqNN8_FDIOrrMH3IBUFP/exec";
+
+  // If we arrived here from the site-forms navigation (?site=Florence),
+  // pre-fill and lock the Site Name field so it can't be mistyped.
+  const urlParams = new URLSearchParams(window.location.search);
+  const siteFromUrl = urlParams.get('site');
+  if (siteFromUrl) {
+    const siteField = document.getElementById('siteNameField');
+    siteField.value = siteFromUrl;
+    siteField.readOnly = true;
+    document.getElementById('backLink').href = `forms.html?site=${encodeURIComponent(siteFromUrl)}`;
+  }
+
+  const PPE_OPTIONS = ["Head","Foot","Eyes","Hands","High Viz","Resp","Face","Coveralls","Specialized"];
+  const HAZARD_FIELDS = [
+    {key: "location", label: "Location"},
+    {key: "task", label: "Job Task"},
+    {key: "hazards", label: "Associated Hazards"},
+    {key: "controls", label: "Controls"}
+  ];
+
+  let hazardCount = 0;
+  let workerCount = 0;
+
+  function addHazardRow() {
+    hazardCount++;
+    const idx = hazardCount;
+    const div = document.createElement('div');
+    div.className = 'hazard-row';
+    div.dataset.idx = idx;
+    let inner = `<div class="row-title">Hazard Row ${idx}</div>`;
+    HAZARD_FIELDS.forEach(f => {
+      const isTextarea = f.key === 'hazards' || f.key === 'controls';
+      inner += `<div class="field"><label>${f.label}</label>`;
+      inner += isTextarea
+        ? `<textarea data-field="${f.key}"></textarea>`
+        : `<input type="text" data-field="${f.key}">`;
+      inner += `</div>`;
+    });
+    inner += `<button type="button" class="remove-btn" onclick="this.closest('.hazard-row').remove()">Remove this row</button>`;
+    div.innerHTML = inner;
+    document.getElementById('hazardRows').appendChild(div);
+  }
+
+  function addWorkerRow() {
+    workerCount++;
+    const idx = workerCount;
+    const div = document.createElement('div');
+    div.className = 'worker-row';
+    div.innerHTML = `
+      <div class="row-title">Worker ${idx}</div>
+      <div class="field"><label>First and Last Name</label>
+        <input type="text" data-field="worker">
+      </div>
+      <button type="button" class="remove-btn" onclick="this.closest('.worker-row').remove()">Remove</button>
+    `;
+    document.getElementById('workerRows').appendChild(div);
+  }
+
+  // Build PPE checkboxes
+  const ppeGrid = document.getElementById('ppeGrid');
+  PPE_OPTIONS.forEach(opt => {
+    const label = document.createElement('label');
+    label.className = 'ppe-item';
+    label.innerHTML = `<input type="checkbox" name="ppe" value="${opt}"> ${opt}`;
+    ppeGrid.appendChild(label);
+  });
+
+  // Starting rows
+  for (let i = 0; i < 3; i++) addHazardRow();
+  for (let i = 0; i < 3; i++) addWorkerRow();
+
+  document.getElementById('addHazardBtn').addEventListener('click', addHazardRow);
+  document.getElementById('addWorkerBtn').addEventListener('click', addWorkerRow);
+
+  // Default date/time to now
+  const now = new Date();
+  document.getElementById('dateField').value = now.toISOString().slice(0,10);
+  document.getElementById('timeField').value = now.toTimeString().slice(0,5);
+
+  // Show/hide concern location
+  document.getElementById('concernsYes').addEventListener('change', updateConcerns);
+  document.getElementById('concernsNo').addEventListener('change', updateConcerns);
+  function updateConcerns() {
+    document.getElementById('concernsLocationField').style.display =
+      document.getElementById('concernsYes').checked ? 'block' : 'none';
+  }
+
+  // Hide the config warning banner once a real URL is set
+  if (ACTION_URL && ACTION_URL !== "PASTE_YOUR_APPS_SCRIPT_URL_HERE") {
+    document.getElementById('configWarning').style.display = 'none';
+  }
+
+  const form = document.getElementById('flhaForm');
+  form.addEventListener('submit', function (evt) {
+    if (!ACTION_URL || ACTION_URL === "PASTE_YOUR_APPS_SCRIPT_URL_HERE") {
+      evt.preventDefault();
+      alert("This form isn't connected yet. Open the file and set ACTION_URL near the bottom of the script first.");
+      return;
+    }
+
+    // Collect dynamic hazard rows into JSON
+    const hazards = [];
+    document.querySelectorAll('#hazardRows .hazard-row').forEach(row => {
+      const obj = {};
+      row.querySelectorAll('[data-field]').forEach(el => { obj[el.dataset.field] = el.value; });
+      const hasContent = Object.values(obj).some(v => v && v.trim());
+      if (hasContent) hazards.push(obj);
+    });
+    document.getElementById('hazardsJson').value = JSON.stringify(hazards);
+
+    // Collect dynamic worker rows into JSON
+    const workers = [];
+    document.querySelectorAll('#workerRows [data-field="worker"]').forEach(el => {
+      if (el.value.trim()) workers.push(el.value.trim());
+    });
+    document.getElementById('workersJson').value = JSON.stringify(workers);
+
+    form.action = ACTION_URL;
+
+    // Show success overlay shortly after submit (iframe target means no page navigation)
+    setTimeout(() => {
+      document.getElementById('successOverlay').classList.add('show');
+    }, 700);
+  });
+
+  document.getElementById('newFormBtn').addEventListener('click', function () {
+    window.location.reload();
+  });
+</script>
+
+</body>
+</html>
